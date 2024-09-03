@@ -17,6 +17,12 @@ function Register({navigation}) {
 
 
   const handleSignUp = async () => {
+
+    if (!email || !password || !name) {
+      Alert.alert('Validation Error', 'All fields are required.');
+      return false;
+    }
+
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
@@ -31,7 +37,7 @@ function Register({navigation}) {
       navigation.navigate('Home');
     } catch (error) {
       setError(error.message);
-      console.log(error.message)
+      Alert.alert('Error', error.message);
     }
     setName('');
     setEmail('');

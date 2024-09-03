@@ -2,6 +2,7 @@ import { FlatList, StyleSheet, Text, View, Button } from 'react-native';
 import { useEffect, useState } from 'react';
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
+import { collection } from 'firebase/firestore';
 
 // import { db } from '../firebaseConfig';
 // import { collection, onSnapshot } from 'firebase/firestore';
@@ -10,8 +11,8 @@ import { auth } from '../firebaseConfig';
 function Home({ navigation }) {
   const [error, setError] = useState('');
 
-  const name = "Harikrishnan";
-  const handleLogout = async () => {
+
+    const handleLogout = async () => {
     try {
       await signOut(auth);
       navigation.replace('Login');
@@ -21,19 +22,6 @@ function Home({ navigation }) {
       console.log(error.message)
     }
   };
-
-  const getGreeting = () => {
-    const currentHour = new Date().getHours();
-
-    if (currentHour < 12) {
-      return 'Good Morning';
-    } else if (currentHour < 18) {
-      return 'Good Afternoon';
-    } else {
-      return 'Good Evening';
-    }
-  };
-
   // const [crops, setCrops] = useState([]);
 
   // useEffect(() => {

@@ -9,8 +9,14 @@ function Login({navigation}) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
+  
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Validation Error', 'Email and password are required.');
+      return false;
+    }
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
