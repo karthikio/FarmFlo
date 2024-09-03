@@ -1,17 +1,41 @@
-import { StyleSheet, Text, View, TextInput, Button, Alert } from 'react-native';
+//react
+import { StyleSheet, Text, View, TextInput, Button, Alert, TouchableOpacity } from 'react-native';
 import {useState} from "react";
 
-function Register() {
+//firebase
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth, db } from '../firebaseConfig';
+import { addDoc, collection } from 'firebase/firestore';
+
+
+
+function Register({navigation}) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  const handleRegister = () => {
-    if (email && password) {
-      Alert.alert('Login Successful', `Welcome}!`);
-    } else {
-      Alert.alert('Login Failed', 'Invalid username or password.');
+
+  const handleSignUp = async () => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      await addDoc(collection(db, 'users'), {
+        userId: user.uid,
+        name: name,
+        email: user.email,
+        createdAt: new Date()
+      });
+  
+      navigation.navigate('Home');
+    } catch (error) {
+      setError(error.message);
+      console.log(error.message)
     }
+    setName('');
+    setEmail('');
+    setPassword('');
   };
 
   return (
@@ -28,7 +52,7 @@ function Register() {
 
       <TextInput
         style={styles.input}
-        placeholder="Username"
+        placeholder="Email"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
@@ -48,10 +72,14 @@ function Register() {
       />
       
       <View style={styles.btn}>
-        <Button title="Register" onPress={handleRegister} color="#ffffff" />
+        <Button title="Register" onPress={handleSignUp} color="#ffffff" />
       </View>
 
-      <Text style={styles.link}>Already have an account?</Text>
+      <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+        <Text style={{ color: '#333333', marginTop: 20 }}>
+          Already have an account? Log In
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -87,7 +115,7 @@ const styles = StyleSheet.create({
     height: 40,
     width: "80%",
     borderRadius: 4,
-    backgroundColor: "#00712D", 
+    backgroundColor: "#FF9100", 
     color: "#ffffff", 
     marginTop: 20,
     borderRadius: 10

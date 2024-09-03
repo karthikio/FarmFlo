@@ -1,24 +1,31 @@
-import { StyleSheet, Text, View, TextInput, Button, Alert } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, Alert, TouchableOpacity } from 'react-native';
 import {useState} from "react";
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../firebaseConfig';
 
-function Login() {
+
+function Login({navigation}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  const handleLogin = () => {
-    if (email && password) {
-      Alert.alert("Register Successful.");
-    } else {
-      Alert.alert('Please enter all fields.');
+
+  const handleLogin = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+      setError(error.message);
+      Alert.alert('Error', error.message);
     }
   };
+
 
   return(
     <View style={styles.loginContainer}>
       <Text style={styles.heading}>Welcome Back</Text>
       <TextInput
         style={styles.input}
-        placeholder="Username"
+        placeholder="Email"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
@@ -39,8 +46,11 @@ function Login() {
       <Button title="Login" onPress={handleLogin} color="#ffffff" />
       </View>
 
-      <Text style={styles.link}>Don't have an account?</Text>
-
+      <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+        <Text style={{ color: '#333333', marginTop: 20 }}>
+          Don't have an account? Register
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -76,7 +86,7 @@ const styles = StyleSheet.create({
     height: 40,
     width: "80%",
     borderRadius: 4,
-    backgroundColor: "#00712D", 
+    backgroundColor: "#FF9100", 
     color: "#ffffff", 
     marginTop: 20,
     borderRadius: 10
@@ -84,8 +94,5 @@ const styles = StyleSheet.create({
   forgetPwd: {
     color: "#D5ED9F",
     fontSize: 10, 
-  }, 
-  link: {
-    marginTop: 30,
-  }
+  },
 })
