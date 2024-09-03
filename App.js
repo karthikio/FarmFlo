@@ -1,12 +1,17 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { useEffect, useState } from 'react';
+import { Ionicons } from '@expo/vector-icons'; 
 
 import Home from './screens/Home';
 import Login from './screens/Login';
 import Register from './screens/Register';
+import Profile from './screens/Profile';
+import Search from './screens/Search';
+import Dashboard from './screens/Dashboard';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { onAuthStateChanged } from 'firebase/auth';
 
 import { auth } from './firebaseConfig';
@@ -14,6 +19,39 @@ import { auth } from './firebaseConfig';
 
 
 const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
+
+function MainTabs() {
+  return (
+    <Tab.Navigator
+    screenOptions={({ route }) => ({
+      tabBarIcon: ({ focused, color, size }) => {
+        let iconName;
+
+        if (route.name === 'Home') {
+          iconName = focused ? 'home' : 'home-outline';
+        } else if (route.name === 'Profile') {
+          iconName = focused ? 'person' : 'person-outline';
+        } else if (route.name === 'Search') {
+          iconName = focused ? 'search' : 'search-outline';
+        } else if (route.name === 'Dashboard') {
+          iconName = focused ? 'grid' : 'grid-outline';
+        }
+
+        // Return the icon component
+        return <Ionicons name={iconName} size={size} color={color} />;
+      },
+      tabBarActiveTintColor: '#00712D',
+      tabBarInactiveTintColor: 'gray',
+    })}
+    >
+      <Tab.Screen name="Home" component={Home} />
+      <Tab.Screen name="Profile" component={Profile} />
+      <Tab.Screen name="Search" component={Search} />
+      <Tab.Screen name="Dashboard" component={Dashboard} />
+    </Tab.Navigator>
+  );
+}
 
 
 export default function App() {
@@ -36,8 +74,8 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator>
         {user ? (
-          <Stack.Screen name="Home" component={Home} />
-        ) : (
+            <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
+          ) : (
           <>
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Register" component={Register} /> 
