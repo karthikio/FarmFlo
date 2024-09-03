@@ -7,11 +7,11 @@ import { auth } from '../firebaseConfig';
 // import { collection, onSnapshot } from 'firebase/firestore';
 
 
-function Home({navigation}) {
+function Home({ navigation }) {
   const [error, setError] = useState('');
 
-
-    const handleLogout = async () => {
+  const name = "Harikrishnan";
+  const handleLogout = async () => {
     try {
       await signOut(auth);
       navigation.replace('Login');
@@ -21,6 +21,19 @@ function Home({navigation}) {
       console.log(error.message)
     }
   };
+
+  const getGreeting = () => {
+    const currentHour = new Date().getHours();
+
+    if (currentHour < 12) {
+      return 'Good Morning';
+    } else if (currentHour < 18) {
+      return 'Good Afternoon';
+    } else {
+      return 'Good Evening';
+    }
+  };
+
   // const [crops, setCrops] = useState([]);
 
   // useEffect(() => {
@@ -34,29 +47,34 @@ function Home({navigation}) {
   //           ...doc.data()
   //         });
   //       });
-  
+
   //       setCrops(crops);
 
   //     }
   //   });
-  
+
   //   // // Unsubscribe from events when no longer in use
   //   return () => subscriber();
   // }, []);
- 
-  return(
-    <View style={styles.homeContainer}>
-      <Text style={styles.text}>Home</Text>
-      {/* <FlatList
+
+  return (
+    <>
+      <View style={styles.WelcomeBanner}>
+        <Text style={styles.greetings} >{`${getGreeting()}, ${name}`}</Text>
+      </View>
+      <View style={styles.homeContainer}>
+        <Text style={styles.text}>Home</Text>
+        {/* <FlatList
         data={crops}
         renderItem={
           (({item}) => <Text>{item.name}</Text>)
         }
         keyExtractor={item => item.id}
       /> */}
-      <Text>{auth.currentUser.email}</Text>
-      <Button title="Logout" onPress={handleLogout} />
-    </View>
+        <Text>{auth.currentUser.email}</Text>
+        <Button title="Logout" onPress={handleLogout} />
+      </View>
+    </>
   );
 }
 
@@ -65,12 +83,12 @@ export default Home;
 const styles = StyleSheet.create({
   homeContainer: {
     flex: 1,
-    alignItems: "center", 
-    justifyContent: "center", 
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: "#f5f6f7",
     paddingTop: 60
-  }, 
+  },
   text: {
     color: "#ffffff",
   }
-})
+});
