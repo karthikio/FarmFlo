@@ -10,9 +10,30 @@ import { collection } from 'firebase/firestore';
 
 function Home({ navigation }) {
   const [error, setError] = useState('');
+  const [user, setUser] = useState('');
 
+<<<<<<< HEAD
+  const name = "Harikrishnan";
+=======
+  useEffect(() => {
+    const user = auth.currentUser;
+    const fetchUserData = () => {
+    if (user){
+      try {
+        const userDoc = collection('user').doc(user.uid).get();
+        if (userDoc.exists){
+          setUser(doc.data());
+        }
+      }catch(error){
+        console.log(error.message)
+      }
+    };
+  };
+  fetchUserData();
+  }, []);
 
-    const handleLogout = async () => {
+>>>>>>> d19b24a (updated)
+  const handleLogout = async () => {
     try {
       await signOut(auth);
       navigation.replace('Login');
@@ -22,6 +43,22 @@ function Home({ navigation }) {
       console.log(error.message)
     }
   };
+
+<<<<<<< HEAD
+  const getGreeting = () => {
+    const currentHour = new Date().getHours();
+
+    if (currentHour < 12) {
+      return 'Good Morning';
+    } else if (currentHour < 18) {
+      return 'Good Afternoon';
+    } else {
+      return 'Good Evening';
+    }
+  };
+=======
+>>>>>>> d19b24a (updated)
+
   // const [crops, setCrops] = useState([]);
 
   // useEffect(() => {
