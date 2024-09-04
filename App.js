@@ -8,6 +8,7 @@ import Register from './screens/Register';
 import Profile from './screens/Profile';
 import Search from './screens/Search';
 import Dashboard from './screens/Dashboard';
+import AddCrop from './screens/AddCrop';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -45,7 +46,7 @@ function MainTabs() {
       tabBarInactiveTintColor: 'gray',
     })}
     >
-      <Tab.Screen name="Home" component={Home} />
+      <Tab.Screen name="Home" component={Home}  options={{ title: 'FarmFlo' }} />
       <Tab.Screen name="Profile" component={Profile} />
       <Tab.Screen name="Search" component={Search} />
       <Tab.Screen name="Dashboard" component={Dashboard} />
@@ -74,7 +75,10 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator>
         {user ? (
+          <>
             <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
+            <Stack.Screen name="AddCrop" component={AddCrop} options={{ title: 'Add Crop' }} />
+          </>
           ) : (
           <>
             <Stack.Screen name="Login" component={Login} />

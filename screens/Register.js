@@ -1,11 +1,11 @@
 //react
-import { StyleSheet, Text, View, TextInput, Button, Alert, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, Alert, TouchableOpacity, Switch } from 'react-native';
 import {useState} from "react";
 
 //firebase
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../firebaseConfig';
-import { addDoc, collection } from 'firebase/firestore';
+import { setDoc, doc } from 'firebase/firestore';
 
 
 
@@ -14,6 +14,7 @@ function Register({navigation}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isSeller, setIsSeller] = useState(false);
 
 
   const handleSignUp = async () => {
@@ -27,10 +28,11 @@ function Register({navigation}) {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      await addDoc(collection(db, 'users'), {
-        userId: user.uid,
+      await setDoc(doc(db, 'users', user.uid), {
+        uid: user.uid,
         name: name,
         email: user.email,
+        status: isSeller, 
         createdAt: new Date()
       });
   
@@ -76,6 +78,16 @@ function Register({navigation}) {
         autoCapitalize="none"
         autoCorrect={false} 
       />
+
+      <View style={styles.switchContainer}>
+        <Text style={styles.text}>I'm Seller / Farmer</Text>
+        <Switch
+          value={isSeller}
+          onValueChange={setIsSeller}
+          trackColor={{ false: "#767577", true: "#81b0ff" }}
+          thumbColor={isSeller ? "#f5dd4b" : "#f4f3f4"}
+        />
+      </View> 
       
       <View style={styles.btn}>
         <Button title="Register" onPress={handleSignUp} color="#ffffff" />
@@ -90,7 +102,6 @@ function Register({navigation}) {
   );
 }
 
-export default Register;
 
 const styles = StyleSheet.create({
     registerContainer: {
@@ -117,6 +128,13 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: '#fff',
   },
+  text: {
+    fontSize: 18,
+    marginVertical: 10,
+    paddingLeft: 10,
+    color: "#333333", 
+    fontWeight: "bold"
+  },
     btn: {
     height: 40,
     width: "80%",
@@ -128,5 +146,14 @@ const styles = StyleSheet.create({
   },
   link: {
     marginTop: 30,
-  }
+  }, 
+  switchContainer: { 
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    justifyContent: 'space-between',
+    width: '100%',
+  },
 })
+
+export default Register;

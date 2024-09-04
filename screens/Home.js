@@ -1,90 +1,75 @@
-import { FlatList, StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator, Button } from 'react-native';
 import { useEffect, useState } from 'react';
-import { signOut } from 'firebase/auth';
-import { auth } from '../firebaseConfig';
 
-import { db } from '../firebaseConfig';
-import { collection, onSnapshot } from 'firebase/firestore';
 
+//hooks
+import useUserData from "../hooks/useUserData";
 
 function Home({navigation}) {
-  const [error, setError] = useState('');
-  const [user, setUser] = useState('');
 
-  useEffect(() => {
-    const user = auth.currentUser;
+  const { user, loading, error, updateUserData } = useUserData();
 
-    const fetchUserData = () => {
-    if (user){
-      console.log(user.uid)
-    };
-  };
-  fetchUserData();
-  }, []);
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      navigation.replace('Login');
-      console.log(auth.onAuthStateChanged)
-    } catch (error) {
-      setError(error.message);
-      console.log(error.message)
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) {
+      return 'Good Morning';
+    } else if (hour < 18) {
+      return 'Good Afternoon';
+    } else {
+      return 'Good Evening';
     }
   };
 
+  const greeting = getGreeting(); 
 
-  // const [crops, setCrops] = useState([]);
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
 
-  // useEffect(() => {
-  //   const cropRef = collection(db, 'crop');
-  //   const subscriber = onSnapshot(cropRef, {
-  //     next: (snapshot) => {
-  //       const crops= [];
-  //       snapshot.docs.forEach((doc) => {
-  //         crops.push({
-  //           id: doc.id,
-  //           ...doc.data()
-  //         });
-  //       });
-  
-  //       setCrops(crops);
-
-  //     }
-  //   });
-  
-  //   // // Unsubscribe from events when no longer in use
-  //   return () => subscriber();
-  // }, []);
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text>Error: {error}</Text>
+      </View>
+    );
+  }
  
   return(
     <View style={styles.homeContainer}>
-      <Text style={styles.text}>Home</Text>
-      {/* <FlatList
-        data={crops}
-        renderItem={
-          (({item}) => <Text>{item.name}</Text>)
-        }
-        keyExtractor={item => item.id}
-      /> */}
-      <Text>{auth.currentUser.email}</Text>
+      <Text style={styles.greet}>{`${greeting}, ${user.name}!`}</Text>
 
-      <Button title="Logout" onPress={handleLogout} />
+      {user.status && (
+        <Button
+          title="Add Crop"
+          onPress={() => navigation.navigate('AddCrop')}
+          color="#00712D"
+        />
+      )}
     </View>
   );
 }
 
-export default Home;
 
 const styles = StyleSheet.create({
   homeContainer: {
     flex: 1,
-    alignItems: "center", 
-    justifyContent: "center", 
+    alignItems: "flex-start", 
+    justifyContent: "flex-start", 
     backgroundColor: "#f5f6f7",
-    paddingTop: 60
+    paddingTop: 20, 
+    padding: 10,
   }, 
   text: {
     color: "#ffffff",
+  }, 
+  greet: {
+    fontWeight: "bold", 
+    fontSize: 16,
   }
 })
+
+export default Home;

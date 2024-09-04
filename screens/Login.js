@@ -61,8 +61,6 @@ function Login({navigation}) {
   );
 }
 
-export default Login;
-
 const styles = StyleSheet.create({
     loginContainer: {
     flex: 1,
@@ -102,3 +100,5 @@ const styles = StyleSheet.create({
     fontSize: 10, 
   },
 })
+
+export default Login;
