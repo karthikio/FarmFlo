@@ -142,7 +142,7 @@ const Profile = () => {
     />
 
   <View style={styles.switchContainer}>
-      <Text style={styles.text}>Seller</Text>
+      <Text style={styles.text}>Export crops</Text>
       <Switch
           value={isSeller}
           onValueChange={setIsSeller}

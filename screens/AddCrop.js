@@ -6,6 +6,7 @@ import { db, storage } from '../firebaseConfig';
 import { collection, addDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
+
 const AddCrop = ({ navigation }) => {
   const [name, setName] = useState('');
   const [photo, setPhoto] = useState(null);
@@ -85,8 +86,6 @@ const AddCrop = ({ navigation }) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Add Crop</Text>
-
       <TextInput
         placeholder="Name"
         value={name}
@@ -148,7 +147,9 @@ const AddCrop = ({ navigation }) => {
       {loading ? (
         <ActivityIndicator size="large" color="#00712D" />
       ) : (
-        <Button title="Save" onPress={handleSave} color="#00712D" />
+        <TouchableOpacity style={styles.imagePicker} onPress={handleSave}>
+          <Text style={styles.imagePickerText}>Save</Text>
+        </TouchableOpacity>
       )}
     </ScrollView>
   );
