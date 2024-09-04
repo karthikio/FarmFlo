@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { db } from '../firebaseConfig';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 
@@ -34,10 +34,17 @@ const Marketplace = () => {
 
   const renderItem = ({ item }) => (
     <View style={styles.cropItem}>
-      <Text style={styles.cropName}>{item.name}</Text>
-      <Text style={styles.cropPrice}>Price: ₹{item.pricePerUnit}</Text>
-      <Text style={styles.cropQuantity}>Available Quantity: {item.availableQuantity}</Text>
-      <Text style={styles.cropLocation}>Location: {item.location}</Text>
+      {item.photo ? (
+        <Image source={{ uri: item.photo }} style={styles.cropImage} />
+      ) : (
+        <Text style={styles.noImageText}>No Image Available</Text>
+      )}
+      <View style={styles.cropDetails}>
+        <Text style={styles.cropName}>{item.name}</Text>
+        <Text style={styles.cropPrice}>Price: ₹{item.pricePerUnit}</Text>
+        <Text style={styles.cropQuantity}>Available Quantity: {item.availableQuantity}</Text>
+        <Text style={styles.cropLocation}>Location: {item.location}</Text>
+      </View>
     </View>
   );
 
@@ -47,7 +54,6 @@ const Marketplace = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Marketplace</Text>
       <TouchableOpacity style={styles.sortButton} onPress={handleSortChange}>
         <Text style={styles.sortText}>
           Sort by Price: {sortOption === 'lowToHigh' ? 'Low to High' : 'High to Low'}
@@ -90,6 +96,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   cropItem: {
+    flexDirection: 'row',
     backgroundColor: '#fff',
     padding: 15,
     borderRadius: 5,
@@ -98,6 +105,25 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
+  },
+  cropImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 5,
+    marginRight: 15,
+  },
+  noImageText: {
+    width: 80,
+    height: 80,
+    borderRadius: 5,
+    backgroundColor: '#ccc',
+    textAlign: 'center',
+    lineHeight: 80, // To center the text vertically
+    marginRight: 15,
+  },
+  cropDetails: {
+    flex: 1,
+    justifyContent: 'center',
   },
   cropName: {
     fontSize: 18,
