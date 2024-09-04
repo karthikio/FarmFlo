@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Image, TextInput } from 'react-native';
 import { db } from '../firebaseConfig';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 
-const Marketplace = () => {
+const Marketplace = ({ navigation }) => {
   const [crops, setCrops] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sortOption, setSortOption] = useState('lowToHigh');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchCrops();
-  }, [sortOption]);
+  }, [sortOption, searchQuery]);
 
   const fetchCrops = async () => {
     setLoading(true);
@@ -19,11 +20,21 @@ const Marketplace = () => {
         collection(db, 'crops'),
         orderBy('pricePerUnit', sortOption === 'lowToHigh' ? 'asc' : 'desc')
       );
+
       const querySnapshot = await getDocs(q);
-      const cropsData = querySnapshot.docs.map(doc => ({
+      let cropsData = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
       }));
+
+      if (searchQuery) {
+        cropsData = cropsData.filter(
+          crop =>
+            crop.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            crop.location.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
+
       setCrops(cropsData);
     } catch (error) {
       console.error('Error fetching crops:', error);
@@ -33,7 +44,10 @@ const Marketplace = () => {
   };
 
   const renderItem = ({ item }) => (
-    <View style={styles.cropItem}>
+    <TouchableOpacity
+      style={styles.cropItem}
+      onPress={() => navigation.navigate('CropDetail', { crop: item })}
+    >
       {item.photo ? (
         <Image source={{ uri: item.photo }} style={styles.cropImage} />
       ) : (
@@ -45,7 +59,7 @@ const Marketplace = () => {
         <Text style={styles.cropQuantity}>Available Quantity: {item.availableQuantity}</Text>
         <Text style={styles.cropLocation}>Location: {item.location}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   const handleSortChange = () => {
@@ -54,6 +68,12 @@ const Marketplace = () => {
 
   return (
     <View style={styles.container}>
+      <TextInput
+        style={styles.searchBar}
+        placeholder="Search crops by name or location..."
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+      />
       <TouchableOpacity style={styles.sortButton} onPress={handleSortChange}>
         <Text style={styles.sortText}>
           Sort by Price: {sortOption === 'lowToHigh' ? 'Low to High' : 'High to Low'}
@@ -78,11 +98,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f6f7',
     padding: 20,
   },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#00712D',
+  searchBar: {
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 20,
+    backgroundColor: '#fff',
   },
   sortButton: {
     padding: 10,
@@ -118,7 +141,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: '#ccc',
     textAlign: 'center',
-    lineHeight: 80, // To center the text vertically
+    lineHeight: 80,
     marginRight: 15,
   },
   cropDetails: {
@@ -138,6 +161,12 @@ const styles = StyleSheet.create({
   cropQuantity: {
     fontSize: 14,
     color: '#666',
+    marginTop: 5,
+  },
+  cropLocation: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 5,
     marginTop: 5,
   },
   cropLocation: {

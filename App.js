@@ -9,6 +9,7 @@ import Profile from './screens/Profile';
 import Dashboard from './screens/Dashboard';
 import AddCrop from './screens/AddCrop';
 import Marketplace from './screens/Marketplace';
+import CropDetail from './screens/CropDetail';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -33,7 +34,7 @@ function MainTabs() {
         } else if (route.name === 'Profile') {
           iconName = focused ? 'person' : 'person-outline';
         } else if (route.name === 'Marketplace') {
-          iconName = focused ? 'leaf' : 'leaf-outline';
+          iconName = focused ? 'cart' : 'cart-outline';
         } else if (route.name === 'Dashboard') {
           iconName = focused ? 'grid' : 'grid-outline';
         }
@@ -77,6 +78,7 @@ export default function App() {
           <>
             <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
             <Stack.Screen name="AddCrop" component={AddCrop} options={{ title: 'Add Crop' }} />
+            <Stack.Screen name="CropDetail" component={CropDetail} />
           </>
           ) : (
           <>

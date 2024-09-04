@@ -11,7 +11,7 @@ import { signOut } from 'firebase/auth';
 import useUserData from "../hooks/useUserData";
 
 
-const Profile = () => {
+const Profile = ({navigation}) => {
 
   const [userData, setUserData] = useState({});
   const [email, setEmail] = useState('');

@@ -1,25 +1,19 @@
-//react
 import { StyleSheet, Text, View, TextInput, Button, Alert, TouchableOpacity, Switch } from 'react-native';
-import {useState} from "react";
-
-//firebase
+import { useState } from "react";
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../firebaseConfig';
 import { setDoc, doc } from 'firebase/firestore';
 
-
-
-function Register({navigation}) {
+function Register({ navigation }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState(''); // New state for phone number
   const [error, setError] = useState('');
   const [isSeller, setIsSeller] = useState(false);
 
-
   const handleSignUp = async () => {
-
-    if (!email || !password || !name) {
+    if (!email || !password || !name || !phoneNumber) {
       Alert.alert('Validation Error', 'All fields are required.');
       return false;
     }
@@ -32,6 +26,7 @@ function Register({navigation}) {
         uid: user.uid,
         name: name,
         email: user.email,
+        phoneNumber: phoneNumber, // Save phone number
         status: isSeller, 
         createdAt: new Date()
       });
@@ -44,6 +39,7 @@ function Register({navigation}) {
     setName('');
     setEmail('');
     setPassword('');
+    setPhoneNumber('');
   };
 
   return (
@@ -79,13 +75,23 @@ function Register({navigation}) {
         autoCorrect={false} 
       />
 
+      <TextInput
+        style={styles.input}
+        placeholder="Phone Number"
+        value={phoneNumber}
+        onChangeText={setPhoneNumber}
+        keyboardType="phone-pad"
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+
       <View style={styles.switchContainer}>
         <Text style={styles.text}>I'm Seller / Farmer</Text>
         <Switch
           value={isSeller}
           onValueChange={setIsSeller}
-          trackColor={{ false: "#767577", true: "#81b0ff" }}
-          thumbColor={isSeller ? "#f5dd4b" : "#f4f3f4"}
+          trackColor={{ false: "#FF9100", true: "#FF9100" }}
+          thumbColor={isSeller ? "#fff" : "#FF9100"}
         />
       </View> 
       
@@ -102,9 +108,8 @@ function Register({navigation}) {
   );
 }
 
-
 const styles = StyleSheet.create({
-    registerContainer: {
+  registerContainer: {
     flex: 1,
     alignItems: "center",
     paddingTop: 100,
@@ -135,7 +140,7 @@ const styles = StyleSheet.create({
     color: "#333333", 
     fontWeight: "bold"
   },
-    btn: {
+  btn: {
     height: 40,
     width: "80%",
     borderRadius: 4,

@@ -5,9 +5,10 @@ import * as ImagePicker from 'expo-image-picker';
 import { db, storage } from '../firebaseConfig';
 import { collection, addDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-
+import useUserData from '../hooks/useUserData'; // Import useUserData hook
 
 const AddCrop = ({ navigation }) => {
+  const { user } = useUserData(); // Get current user details
   const [name, setName] = useState('');
   const [photo, setPhoto] = useState(null);
   const [pricePerUnit, setPricePerUnit] = useState('');
@@ -72,6 +73,8 @@ const AddCrop = ({ navigation }) => {
         description,
         harvestedDate,
         location,
+        sellerName: user?.name, // Add sellerName from user data
+        sellerContact: user?.phoneNumber, // Add sellerContact from user data
       });
 
       Alert.alert('Success', 'Crop added successfully');
@@ -160,13 +163,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 20,
     backgroundColor: '#f5f6f7',
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#00712D',
-    marginBottom: 20,
-    textAlign: 'center',
   },
   input: {
     height: 50,
