@@ -22,6 +22,7 @@ const CropDetail = ({ route, navigation }) => {
       const notificationData = {
         userName: user.name || 'Anonymous',
         userId: user.uid,
+        userNumber: user.phoneNumber,
         cropName: crop.name,
         cropId: crop.id,
         sellerUid: crop.userId, 

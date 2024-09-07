@@ -5,6 +5,7 @@ import { collection, query, where, getDocs, doc, deleteDoc, onSnapshot } from 'f
 import useUserData from '../hooks/useUserData';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 const Dashboard = () => {
   const { user, loading, updateUserData } = useUserData();
@@ -12,6 +13,12 @@ const Dashboard = () => {
   const [loadingCrops, setLoadingCrops] = useState(true);
   const [notifications, setNotifications] = useState([]);
   const [loadingNotifications, setLoadingNotifications] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(null);
+  const [items, setItems] = useState([
+    { label: 'Notifications', value: 'notifications' },
+    { label: 'My Crops', value: 'crops' },
+  ]);
   const navigation = useNavigation();
 
   // Fetch user crops
@@ -42,6 +49,7 @@ const Dashboard = () => {
             id: doc.id,
             ...doc.data(),
           }));
+          notificationsList.sort((a, b) => b.timestamp.toDate() - a.timestamp.toDate());
           setNotifications(notificationsList);
           setLoadingNotifications(false);
         },
@@ -92,8 +100,9 @@ const Dashboard = () => {
   const renderNotificationItem = ({ item }) => (
     <View style={styles.notificationItem}>
       <View style={styles.notificationContent}>
-        <Text style={styles.notificationText}>Buyer: {item.userName}</Text>
+        <Text style={styles.notificationText}>Customer: {item.userName}</Text>
         <Text style={styles.notificationText}>Crop: {item.cropName}</Text>
+        <Text style={styles.notificationText}>Contact: {item.userNumber}</Text>
         <Text style={styles.notificationText}>Timestamp: {new Date(item.timestamp.toDate()).toLocaleString()}</Text>
       </View>
       <TouchableOpacity style={styles.deleteIconButton} onPress={() => handleDeleteNotification(item.id)}>
@@ -119,6 +128,8 @@ const Dashboard = () => {
     </View>
   );
 
+  const hasNotifications = notifications.length > 0;
+
   return (
     <View style={styles.container}>
       {loading || loadingCrops || loadingNotifications ? (
@@ -129,19 +140,38 @@ const Dashboard = () => {
           <TouchableOpacity style={styles.linkButton} onPress={() => navigation.navigate('AddCrop')}>
             <Text style={styles.linkButtonText}>Add Crop</Text>
           </TouchableOpacity>
-          <FlatList
-            data={userCrops}
-            renderItem={renderCropItem}
-            keyExtractor={item => item.id}
-            contentContainerStyle={styles.listContainer}
+          <DropDownPicker
+            open={open}
+            value={value}
+            items={items}
+            setOpen={setOpen}
+            setValue={setValue}
+            setItems={setItems}
+            placeholder="Select View"
+            style={styles.dropdown}
+            dropDownContainerStyle={styles.dropdownContainer}
           />
-          <Text style={styles.notificationsTitle}>Notifications</Text>
-          <FlatList
-            data={notifications}
-            renderItem={renderNotificationItem}
-            keyExtractor={item => item.id}
-            contentContainerStyle={styles.listContainer}
-          />
+          {value === 'crops' && (
+            <FlatList
+              data={userCrops}
+              renderItem={renderCropItem}
+              keyExtractor={item => item.id}
+              contentContainerStyle={styles.listContainer}
+            />
+          )}
+          {value === 'notifications' && (
+            <View style={styles.notificationContainer}>
+              {hasNotifications && (
+                <Icon name="bell" size={30} color="#FF5A5F" style={styles.notificationIcon} />
+              )}
+              <FlatList
+                data={notifications}
+                renderItem={renderNotificationItem}
+                keyExtractor={item => item.id}
+                contentContainerStyle={styles.listContainer}
+              />
+            </View>
+          )}
         </>
       ) : (
         renderBecomeSellerMessage()
@@ -211,61 +241,79 @@ const styles = StyleSheet.create({
     paddingBottom: 50,
     paddingTop: 20,
   },
-  becomeSellerContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  becomeSellerText: {
-    fontSize: 18,
-    color: '#333',
-    marginTop: 20,
-    textAlign: 'center',
-    paddingHorizontal: 20,
-  },
-  linkButton: {
-    marginTop: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: '#00712D',
-    borderRadius: 5,
-  },
-  linkButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center'
-  },
-  notificationsTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#00712D',
-    marginTop: 20,
-  },
-  notificationItem: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  notificationContent: {
-    flex: 1,
-  },
-  notificationText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  deleteIconButton: {
-    padding: 10,
-    borderRadius: 5,
-  },
-});
+    becomeSellerContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    becomeSellerText: {
+      fontSize: 18,
+      color: '#333',
+      marginTop: 20,
+      textAlign: 'center',
+      paddingHorizontal: 20,
+    },
+    linkButton: {
+      marginTop: 20,
+      paddingVertical: 10,
+      paddingHorizontal: 20,
+      backgroundColor: '#00712D',
+      borderRadius: 5,
+    },
+    linkButtonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: 'bold',
+      textAlign: 'center'
+    },
+    dropdown: {
+      marginTop: 20,
+      borderColor: '#00712D',
+      borderWidth: 1,
+      backgroundColor: '#fff',
+    },
+    dropdownContainer: {
+      borderColor: '#00712D',
+      backgroundColor: '#fff',
+    },
+    notificationsTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: '#00712D',
+      marginTop: 20,
+    },
+    notificationContainer: {
+      flex: 1,
+      marginTop: 10,
+    },
+    notificationItem: {
+      backgroundColor: '#fff',
+      padding: 15,
+      borderRadius: 8,
+      marginBottom: 10,
+      shadowColor: '#000',
+      shadowOpacity: 0.1,
+      shadowRadius: 5,
+      elevation: 3,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    notificationContent: {
+      flex: 1,
+    },
+    notificationText: {
+      fontSize: 16,
+      color: '#333',
+    },
+    deleteIconButton: {
+      padding: 10,
+      borderRadius: 5,
+    },
+    notificationIcon: {
+      alignSelf: 'flex-end',
+      marginBottom: 10,
+    },
+  });
 
-export default Dashboard;
+  export default Dashboard;
