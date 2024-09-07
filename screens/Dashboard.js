@@ -21,21 +21,27 @@ const Dashboard = () => {
   ]);
   const navigation = useNavigation();
 
-  // Fetch user crops
   useEffect(() => {
-    const fetchUserCrops = async () => {
-      if (user?.uid) {
-        const q = query(collection(db, 'crops'), where('userId', '==', user.uid));
-        const querySnapshot = await getDocs(q);
+    if (user?.uid) {
+      const q = query(collection(db, 'crops'), where('userId', '==', user.uid));
+
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
         const cropsList = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
         }));
         setUserCrops(cropsList);
-      }
+        setLoadingCrops(false);
+      }, (error) => {
+        console.error('Error fetching user crops:', error);
+        setLoadingCrops(false);
+      });
+
+      // Clean up the listener on unmount
+      return () => unsubscribe();
+    } else {
       setLoadingCrops(false);
-    };
-    fetchUserCrops();
+    }
   }, [user]);
 
   // Real-time listener for notifications

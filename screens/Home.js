@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, ActivityIndicator, FlatList, Image, TextInput, 
 import { useEffect, useState } from 'react';
 import { useRoute } from '@react-navigation/native';
 import { db } from '../firebaseConfig';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, onSnapshot } from 'firebase/firestore';
 
 //hooks
 import useUserData from "../hooks/useUserData";
@@ -19,25 +19,23 @@ function Home({ navigation }) {
     if (route.params?.updatedUser) {
       updateUserData(route.params.updatedUser);
     }
-    fetchCrops();
-  }, [route.params?.updatedUser]);
-
-  const fetchCrops = async () => {
-    setCropsLoading(true);
-    try {
-      const querySnapshot = await getDocs(collection(db, 'crops'));
+    // Set up real-time listener for crops
+    const unsubscribe = onSnapshot(collection(db, 'crops'), (querySnapshot) => {
       const cropsData = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
       }));
       setCrops(cropsData);
       setFilteredCrops(cropsData); // Initially, show all crops
-    } catch (error) {
-      console.error('Error fetching crops:', error);
-    } finally {
       setCropsLoading(false);
-    }
-  };
+    }, (error) => {
+      console.error('Error fetching crops:', error);
+      setCropsLoading(false);
+    });
+
+    // Clean up the listener on unmount
+    return () => unsubscribe();
+  }, [route.params?.updatedUser]);
 
   // Function to filter crops based on search query
   const handleSearch = (query) => {
