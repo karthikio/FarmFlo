@@ -56,7 +56,6 @@ const Profile = ({navigation}) => {
     });
     setModalVisible(false);
 
-    navigation.navigate('Dashboard', { updatedUser: { name, phoneNumber, location, status: isSeller } });
   };
 
   const handleCancel = () => {

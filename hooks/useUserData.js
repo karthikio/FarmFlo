@@ -1,7 +1,7 @@
 // useUserData.js
 import { useState, useEffect } from 'react';
 import { auth, db } from '../firebaseConfig'; 
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, onSnapshot } from 'firebase/firestore';
 
 const useUserData = () => {
   const [user, setUser] = useState(null);
@@ -14,22 +14,27 @@ const useUserData = () => {
         const user = auth.currentUser;
         if (user) {
           const docRef = doc(db, "users", user.uid);
-          const docSnap = await getDoc(docRef);
-
-          if (docSnap.exists()) {
-            setUser(docSnap.data());
-          } else {
-            console.log('No such document!');
-          }
+  
+          // Use Firestore's real-time listener
+          const unsubscribe = onSnapshot(docRef, (docSnap) => {
+            if (docSnap.exists()) {
+              setUser(docSnap.data()); // Update state with real-time data
+            } else {
+              console.log("No such document!");
+            }
+          });
+  
+          // Clean up the listener when the component unmounts
+          return () => unsubscribe();
         }
       } catch (error) {
         setError(error.message);
-        console.error('Error fetching user data: ', error);
+        console.error("Error fetching user data: ", error);
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchUserData();
   }, []);
 

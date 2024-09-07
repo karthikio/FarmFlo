@@ -1,8 +1,42 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { db } from '../firebaseConfig'; // Import Firestore and Auth
+import { doc, addDoc, collection } from 'firebase/firestore';
 
-const CropDetail = ({ route }) => {
+
+//hooks
+import useUserData from "../hooks/useUserData";
+
+const CropDetail = ({ route, navigation }) => {
   const { crop } = route.params;
+  const { user, loading, error, updateUserData } = useUserData();
+  
+
+  const handleNotifySeller = async () => {
+    try {
+      if (!user) {
+        Alert.alert('Error', 'You must be logged in to notify the seller.');
+        return;
+      }
+
+      const notificationData = {
+        userName: user.name || 'Anonymous',
+        userId: user.uid,
+        cropName: crop.name,
+        cropId: crop.id,
+        sellerUid: crop.userId, 
+        timestamp: new Date(),
+      };
+
+      // Add the document to Firestore
+      await addDoc(collection(db, 'notifications'), notificationData);
+
+      Alert.alert('Success', 'Seller has been notified successfully!');
+    } catch (error) {
+      console.error('Error notifying seller: ', error);
+      Alert.alert('Error', 'There was an error notifying the seller.');
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -25,6 +59,10 @@ const CropDetail = ({ route }) => {
         <Text style={styles.cropDescription}>Description: {crop.description}</Text>
       </View>
 
+      {/* Notify Seller Button */}
+      <TouchableOpacity style={styles.notifyButton} onPress={handleNotifySeller}>
+        <Text style={styles.notifyButtonText}>Notify Seller</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 };
@@ -106,6 +144,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
     marginTop: 5,
+  },
+  notifyButton: {
+    backgroundColor: '#00712D',
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  notifyButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 
