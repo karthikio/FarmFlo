@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Button, Alert, Platform, Image, ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Button, Alert, Platform, Image, ActivityIndicator, ScrollView, TouchableOpacity, KeyboardAvoidingView, Keyboard } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import { db, storage } from '../firebaseConfig';
@@ -88,83 +88,89 @@ const AddCrop = ({ navigation }) => {
     }
   };
 
-
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <TextInput
-        placeholder="Name"
-        value={name}
-        onChangeText={setName}
-        style={styles.input}
-      />
-      
-      <TouchableOpacity style={styles.imagePicker} onPress={handleImagePicker}>
-        <Text style={styles.imagePickerText}>Select Image</Text>
-      </TouchableOpacity>
-
-      {imageUri && <Image source={{ uri: imageUri }} style={styles.image} />}
-
-      <TextInput
-        placeholder="Price Per Unit"
-        value={pricePerUnit}
-        onChangeText={setPricePerUnit}
-        keyboardType="numeric"
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Available Quantity"
-        value={availableQuantity}
-        onChangeText={setAvailableQuantity}
-        keyboardType="numeric"
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Description"
-        value={description}
-        onChangeText={setDescription}
-        style={[styles.input, styles.textArea]}
-        multiline={true}
-        numberOfLines={4}
-      />
-      <TextInput
-        placeholder="Location"
-        value={location}
-        onChangeText={setLocation}
-        style={styles.input}
-      />
-
-      <View style={styles.dateContainer}>
-        <Text style={styles.dateText}>Harvested Date:</Text>
-        <TouchableOpacity onPress={() => setShowDatePicker(true)}>
-          <Text style={styles.datePickerText}>{harvestedDate.toDateString()}</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+    >
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <TextInput
+          placeholder="Name"
+          value={name}
+          onChangeText={setName}
+          style={styles.input}
+        />
+        
+        <TouchableOpacity style={styles.imagePicker} onPress={handleImagePicker}>
+          <Text style={styles.imagePickerText}>Select Image</Text>
         </TouchableOpacity>
-        {showDatePicker && (
-          <DateTimePicker
-            testID="dateTimePicker"
-            value={harvestedDate}
-            mode="date"
-            display="default"
-            onChange={handleDateChange}
-          />
+
+        {imageUri && <Image source={{ uri: imageUri }} style={styles.image} />}
+
+        <TextInput
+          placeholder="Price Per Unit"
+          value={pricePerUnit}
+          onChangeText={setPricePerUnit}
+          keyboardType="numeric"
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="Available Quantity"
+          value={availableQuantity}
+          onChangeText={setAvailableQuantity}
+          keyboardType="numeric"
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="Description"
+          value={description}
+          onChangeText={setDescription}
+          style={[styles.input, styles.textArea]}
+          multiline={true}
+          numberOfLines={4}
+        />
+        <TextInput
+          placeholder="Location"
+          value={location}
+          onChangeText={setLocation}
+          style={styles.input}
+        />
+
+        <View style={styles.dateContainer}>
+          <Text style={styles.dateText}>Harvested Date:</Text>
+          <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+            <Text style={styles.datePickerText}>{harvestedDate.toDateString()}</Text>
+          </TouchableOpacity>
+          {showDatePicker && (
+            <DateTimePicker
+              testID="dateTimePicker"
+              value={harvestedDate}
+              mode="date"
+              display="default"
+              onChange={handleDateChange}
+            />
+          )}
+        </View>
+
+        {loading ? (
+          <ActivityIndicator size="large" color="#00712D" />
+        ) : (
+          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+            <Text style={styles.saveButtonText}>Save</Text>
+          </TouchableOpacity>
         )}
-      </View>
-
-      {loading ? (
-        <ActivityIndicator size="large" color="#00712D" />
-      ) : (
-        <TouchableOpacity style={styles.imagePicker} onPress={handleSave}>
-          <Text style={styles.imagePickerText}>Save</Text>
-        </TouchableOpacity>
-      )}
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    padding: 20,
+    flex: 1,
     backgroundColor: '#f5f6f7',
+  },
+  scrollContainer: {
+    padding: 20,
   },
   input: {
     height: 50,
@@ -209,6 +215,18 @@ const styles = StyleSheet.create({
   datePickerText: {
     fontSize: 16,
     color: '#00712D',
+    fontWeight: 'bold',
+  },
+  saveButton: {
+    backgroundColor: '#00712D',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  saveButtonText: {
+    color: '#fff',
+    fontSize: 16,
     fontWeight: 'bold',
   },
 });
