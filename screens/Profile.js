@@ -1,4 +1,4 @@
-import { View, Text,  StyleSheet, ActivityIndicator, Button, TouchableOpacity, Modal, TextInput, Switch} from "react-native";
+import { View, Text,  StyleSheet, ActivityIndicator, Alert, Button, TouchableOpacity, Modal, TextInput, Switch} from "react-native";
 import {useState, useEffect} from "react";
 import { Ionicons } from '@expo/vector-icons'; 
 
@@ -32,7 +32,6 @@ const Profile = ({navigation}) => {
     }
   }, [user]);
 
-
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -44,6 +43,11 @@ const Profile = ({navigation}) => {
   };
 
   const handleSave = () => {
+    if (!name || !phoneNumber) {
+      Alert.alert('Validation Error', "Some fields are blank.");
+      return false;
+    }
+  
     updateUserData({ 
       name, 
       phoneNumber, 
@@ -51,9 +55,19 @@ const Profile = ({navigation}) => {
       status: isSeller 
     });
     setModalVisible(false);
+
+    navigation.navigate('Dashboard', { updatedUser: { name, phoneNumber, location, status: isSeller } });
   };
 
   const handleCancel = () => {
+    if (!name || !phoneNumber) {
+      Alert.alert('Validation Error', "Some fields are blank.");
+      return false;
+    }
+  
+    setName(user.name || "")
+    setPhoneNumber(user.phoneNumber || "")
+    setLocation(user.location || "")
     setIsSeller(user.status || false);    
     setModalVisible(false);
   };

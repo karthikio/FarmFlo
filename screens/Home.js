@@ -1,13 +1,75 @@
-import { StyleSheet, Text, View, ActivityIndicator, Button } from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator, FlatList, Image, TextInput, TouchableOpacity } from 'react-native';
 import { useEffect, useState } from 'react';
-
+import { useRoute } from '@react-navigation/native';
+import { db } from '../firebaseConfig';
+import { collection, getDocs } from 'firebase/firestore';
 
 //hooks
 import useUserData from "../hooks/useUserData";
 
-function Home({navigation}) {
-
+function Home({ navigation }) {
   const { user, loading, error, updateUserData } = useUserData();
+  const route = useRoute();
+  const [crops, setCrops] = useState([]);
+  const [cropsLoading, setCropsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState(''); // Search query state
+  const [filteredCrops, setFilteredCrops] = useState([]); // State for filtered crops
+
+  useEffect(() => {
+    if (route.params?.updatedUser) {
+      updateUserData(route.params.updatedUser);
+    }
+    fetchCrops();
+  }, [route.params?.updatedUser]);
+
+  const fetchCrops = async () => {
+    setCropsLoading(true);
+    try {
+      const querySnapshot = await getDocs(collection(db, 'crops'));
+      const cropsData = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setCrops(cropsData);
+      setFilteredCrops(cropsData); // Initially, show all crops
+    } catch (error) {
+      console.error('Error fetching crops:', error);
+    } finally {
+      setCropsLoading(false);
+    }
+  };
+
+  // Function to filter crops based on search query
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    if (query.trim() === '') {
+      setFilteredCrops(crops); // If query is empty, show all crops
+    } else {
+      const filtered = crops.filter(crop =>
+        crop.name.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredCrops(filtered); // Update the filtered crops
+    }
+  };
+
+  const renderItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.cropItem}
+      onPress={() => navigation.navigate('CropDetail', { crop: item })}
+    >
+      {item.photo ? (
+        <Image source={{ uri: item.photo }} style={styles.cropImage} />
+      ) : (
+        <Text style={styles.noImageText}>No Image Available</Text>
+      )}
+      <View style={styles.cropDetails}>
+        <Text style={styles.cropName}>{item.name}</Text>
+        <Text style={styles.cropPrice}>Price: ₹{item.pricePerUnit}</Text>
+        <Text style={styles.cropQuantity}>Available Quantity: {item.availableQuantity}</Text>
+        <Text style={styles.cropLocation}>Location: {item.location}</Text>
+      </View>
+    </TouchableOpacity>
+  );
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -22,10 +84,10 @@ function Home({navigation}) {
 
   const greeting = getGreeting(); 
 
-  if (loading) {
+  if (loading || cropsLoading) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#00712D" />
       </View>
     );
   }
@@ -37,39 +99,103 @@ function Home({navigation}) {
       </View>
     );
   }
- 
-  return(
+
+  return (
     <View style={styles.homeContainer}>
       <Text style={styles.greet}>{`${greeting}, ${user.name}!`}</Text>
 
-      {user.status && (
-        <Button
-          title="Add Crop"
-          onPress={() => navigation.navigate('AddCrop')}
-          color="#00712D"
-        />
-      )}
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Search crops by name"
+        value={searchQuery}
+        onChangeText={handleSearch}
+      />
+
+      <FlatList
+        data={filteredCrops} // Use filtered crops for rendering
+        renderItem={renderItem}
+        keyExtractor={item => item.id}
+        contentContainerStyle={styles.cropList}
+      />
     </View>
   );
 }
 
-
 const styles = StyleSheet.create({
   homeContainer: {
     flex: 1,
-    alignItems: "flex-start", 
-    justifyContent: "flex-start", 
-    backgroundColor: "#f5f6f7",
-    paddingTop: 20, 
-    padding: 10,
-  }, 
-  text: {
-    color: "#ffffff",
-  }, 
+    backgroundColor: '#f5f6f7',
+    padding: 20,
+  },
   greet: {
-    fontWeight: "bold", 
+    fontWeight: 'bold',
     fontSize: 16,
-  }
-})
+    marginBottom: 20,
+  },
+  searchInput: {
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 20,
+    backgroundColor: '#fff',
+  },
+  cropItem: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 5,
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  cropImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 5,
+    marginRight: 15,
+  },
+  noImageText: {
+    width: 80,
+    height: 80,
+    borderRadius: 5,
+    backgroundColor: '#ccc',
+    textAlign: 'center',
+    lineHeight: 80,
+    marginRight: 15,
+  },
+  cropDetails: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  cropName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  cropPrice: {
+    fontSize: 16,
+    color: '#00712D',
+    marginTop: 5,
+  },
+  cropQuantity: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 5,
+  },
+  cropLocation: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 5,
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
 
 export default Home;

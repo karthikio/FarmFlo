@@ -38,7 +38,7 @@ const AddCrop = ({ navigation }) => {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 1,
+      quality: 2,
     });
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
@@ -65,7 +65,8 @@ const AddCrop = ({ navigation }) => {
       const downloadURL = await getDownloadURL(storageRef);
 
       // Save crop data to Firestore
-      await addDoc(collection(db, 'crops'), {
+      await addDoc(collection(db, 'crops'), { 
+        userId: user?.uid,
         name,
         photo: downloadURL, // Save the download URL
         pricePerUnit: parseFloat(pricePerUnit),
@@ -86,6 +87,7 @@ const AddCrop = ({ navigation }) => {
       setLoading(false);
     }
   };
+
 
   return (
     <ScrollView contentContainerStyle={styles.container}>

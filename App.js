@@ -8,7 +8,6 @@ import Register from './screens/Register';
 import Profile from './screens/Profile';
 import Dashboard from './screens/Dashboard';
 import AddCrop from './screens/AddCrop';
-import Marketplace from './screens/Marketplace';
 import CropDetail from './screens/CropDetail';
 
 import { NavigationContainer } from '@react-navigation/native';
@@ -33,10 +32,8 @@ function MainTabs() {
           iconName = focused ? 'home' : 'home-outline';
         } else if (route.name === 'Profile') {
           iconName = focused ? 'person' : 'person-outline';
-        } else if (route.name === 'Marketplace') {
-          iconName = focused ? 'cart' : 'cart-outline';
-        } else if (route.name === 'Dashboard') {
-          iconName = focused ? 'grid' : 'grid-outline';
+        } else if (route.name === 'Your Farm') {
+          iconName = focused ? 'leaf' : 'leaf-outline';
         }
 
         // Return the icon component
@@ -47,8 +44,7 @@ function MainTabs() {
     })}
     >
       <Tab.Screen name="Home" component={Home}  options={{ title: 'FarmFlo' }} />
-      <Tab.Screen name="Marketplace" component={Marketplace} />
-      <Tab.Screen name="Dashboard" component={Dashboard} />
+      <Tab.Screen name="Your Farm" component={Dashboard} />
       <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>
   );
