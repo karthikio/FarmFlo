@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TextInput, Button, Alert, TouchableOpacity, Switch } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableWithoutFeedback, Keyboard, Alert, TouchableOpacity, Switch } from 'react-native';
 import { useState } from "react";
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../firebaseConfig';
@@ -43,6 +43,7 @@ function Register({ navigation }) {
   };
 
   return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
     <View style={styles.registerContainer}>
       <Text style={styles.heading}>Create an account</Text>
       <TextInput
@@ -94,10 +95,13 @@ function Register({ navigation }) {
           thumbColor={isSeller ? "#fff" : "#FF9100"}
         />
       </View> 
-      
-      <View style={styles.btn}>
-        <Button title="Register" onPress={handleSignUp} color="#ffffff" />
-      </View>
+
+      <Text>* All fields are required.</Text>
+      <Text>* Password must contain atleast 6 characters.</Text>
+
+      <TouchableOpacity style={styles.btn} onPress={handleSignUp}>
+        <Text style={styles.btnText}>Register</Text>
+      </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.navigate('Login')}>
         <Text style={{ color: '#333333', marginTop: 20 }}>
@@ -105,6 +109,7 @@ function Register({ navigation }) {
         </Text>
       </TouchableOpacity>
     </View>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -145,9 +150,16 @@ const styles = StyleSheet.create({
     width: "80%",
     borderRadius: 4,
     backgroundColor: "#FF9100", 
-    color: "#ffffff", 
+    borderRadius: 10,
     marginTop: 20,
-    borderRadius: 10
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  btnText:{
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center'
   },
   link: {
     marginTop: 30,

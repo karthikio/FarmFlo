@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ActivityIndicator, FlatList, Image, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator, FlatList, Image, TextInput, TouchableOpacity, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { useEffect, useState } from 'react';
 import { useRoute } from '@react-navigation/native';
 import { db } from '../firebaseConfig';
@@ -99,6 +99,7 @@ function Home({ navigation }) {
   }
 
   return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
     <View style={styles.homeContainer}>
       <Text style={styles.greet}>{`${greeting}, ${user.name}!`}</Text>
 
@@ -116,6 +117,7 @@ function Home({ navigation }) {
         contentContainerStyle={styles.cropList}
       />
     </View>
+    </TouchableWithoutFeedback>
   );
 }
 

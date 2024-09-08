@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TextInput, Button, Alert, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Keyboard, TouchableWithoutFeedback, Alert, TouchableOpacity } from 'react-native';
 import {useState} from "react";
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
@@ -27,6 +27,7 @@ function Login({navigation}) {
 
 
   return(
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
     <View style={styles.loginContainer}>
       <Text style={styles.heading}>Welcome Back</Text>
       <TextInput
@@ -48,9 +49,10 @@ function Login({navigation}) {
         autoCapitalize="none"
         autoCorrect={false} 
       />
-      <View style={styles.btn}>
-      <Button title="Login" onPress={handleLogin} color="#ffffff" />
-      </View>
+
+      <TouchableOpacity style={styles.btn} onPress={handleLogin}>
+        <Text style={styles.btnText}>Login</Text>
+      </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.navigate('Register')}>
         <Text style={{ color: '#333333', marginTop: 20 }}>
@@ -58,6 +60,7 @@ function Login({navigation}) {
         </Text>
       </TouchableOpacity>
     </View>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -91,9 +94,16 @@ const styles = StyleSheet.create({
     width: "80%",
     borderRadius: 4,
     backgroundColor: "#FF9100", 
-    color: "#ffffff", 
+    borderRadius: 10,
     marginTop: 20,
-    borderRadius: 10
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  btnText:{
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center'
   },
   forgetPwd: {
     color: "#D5ED9F",

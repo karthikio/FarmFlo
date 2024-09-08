@@ -123,9 +123,10 @@ const Profile = ({navigation}) => {
         <Text style={styles.text}>No user data found</Text>
       )}
 
-    <View style={styles.btn} >
-    <Button title="Edit Profile" onPress={() => setModalVisible(true)} color="#ffffff" />
-    </View>
+    <TouchableOpacity style={styles.btn} onPress={() => setModalVisible(true)}>
+      <Text style={styles.btnText}>Edit Profile</Text>
+    </TouchableOpacity>
+
 
 <Modal
   animationType="slide"
@@ -164,9 +165,14 @@ const Profile = ({navigation}) => {
         />
     </View>
     
-    <View style={styles.horizontal}>
-    <Button title="Cancel" onPress={() => handleCancel()} />
-    <Button title="Save" onPress={handleSave} />
+    <View style={styles.vertical}>
+      <TouchableOpacity style={[styles.btn,styles.cancelBtn]} onPress={() => handleCancel()}>
+        <Text style={styles.btnText}>Cancel</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.btn} onPress={handleSave}>
+        <Text style={styles.btnText}>Save</Text>
+      </TouchableOpacity>
     </View>
 
   </View>
@@ -190,7 +196,7 @@ const styles = StyleSheet.create({
   },
   horizontal:{
     flexDirection: "row",
-    alignItems: "center", 
+    alignItems: 'center',
     paddingBottom: 12, 
   }, 
   title: {
@@ -225,9 +231,16 @@ const styles = StyleSheet.create({
     width: "100%",
     borderRadius: 4,
     backgroundColor: "#FF9100", 
-    color: "#ffffff", 
+    borderRadius: 10,
     marginTop: 20,
-    borderRadius: 10
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  btnText:{
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center'
   },
   switchContainer: { 
     flexDirection: 'row',
@@ -236,6 +249,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
   },
+  cancelBtn:{
+    backgroundColor: "#333333", 
+  }
 });
 
 export default Profile;
